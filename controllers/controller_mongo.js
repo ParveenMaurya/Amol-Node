@@ -9,7 +9,7 @@ function getRndInteger(min, max) {
     return Math.floor(Math.random() * (max - min) ) + min;
 }
 
-function sevenUpDownTopup(req,res){
+async function sevenUpDownTopup(req,res){
     const entry_time = new Date();
     const {error} = validate(req.body);
     // console.log(error);
@@ -24,7 +24,7 @@ function sevenUpDownTopup(req,res){
     }
 
 
-    allModel.UsersModel.find({'user_id' : req.body.user_id}).then(function(result) {
+    await allModel.UsersModel.find({'user_id' : req.body.user_id}).then(function(result) {
         if(isEmpty(result)){
             res.json({status : 404,error : true,result : null, msg : "User not found"});
         }else{
@@ -32,14 +32,14 @@ function sevenUpDownTopup(req,res){
             user = result[0];
             // console.log(user);            
             var id = new mongoose.Types.ObjectId(req.body.product_id);
-            allModel.ProductGameUpdown.find({'_id' : id}).then(function(result) {
+           allModel.ProductGameUpdown.find({'_id' : id}).then(function(result) {
                 if(isEmpty(result)){
                     res.json({status : 404,error : true,result : null, msg : "Product not found"});
                 }else{
                     product = result[0];
                     // var userid = new mongoose.Types.ObjectId(user._id);
                     // console.log(user[0]._id);
-                    allModel.DashboardModel.find({'id' : user.id}).then(function(result) {
+                     allModel.DashboardModel.find({'id' : user.id}).then(function(result) {
                         if(isEmpty(result)){
                             res.json({status : 404,error : true,result : null, msg : "Dashboard data not found"});
                         }else{
@@ -143,10 +143,10 @@ function sevenUpDownTopup(req,res){
         console.log(error);
         res.json({status : false , error : error});
       });
-    
+   
 }
 
-function afterSettingDB(winning_balance,user,product,pin,amount,winning_amount,status,entry_time,topup_balance,type,cb){
+async function afterSettingDB(winning_balance,user,product,pin,amount,winning_amount,status,entry_time,topup_balance,type,cb){
     let topup_arr = {
         id : user.id,
         type : product.id,
@@ -158,7 +158,7 @@ function afterSettingDB(winning_balance,user,product,pin,amount,winning_amount,s
         entry_time : entry_time
     }
     var new_topupGameUpdown = new allModel.TopupGameUpdown(topup_arr);
-    new_topupGameUpdown.save(function(err, result) {
+    await new_topupGameUpdown.save(function(err, result) {
         if(err){
             console.log('aftersetting error');
             console.log(err);
@@ -242,7 +242,7 @@ function afterSettingDB(winning_balance,user,product,pin,amount,winning_amount,s
     });
 }
 
-function inserWalletTransaction(entry_time,user,user_id, pin, amount, type, tr_type, prev_balance, remark, table_name,wallet, status = null,cb){
+async function inserWalletTransaction(entry_time,user,user_id, pin, amount, type, tr_type, prev_balance, remark, table_name,wallet, status = null,cb){
     let balance;
     if(tr_type=="Credit"){
         balance = prev_balance + amount;
@@ -268,7 +268,7 @@ function inserWalletTransaction(entry_time,user,user_id, pin, amount, type, tr_t
     if(table_name == "seven_up_down"){
         // console.log(table_name);
         var new_seven_up_down_wallet_transactions = new allModel.SevenUpDownWalletTransactionModel(insert_transaction_array);
-        new_seven_up_down_wallet_transactions.save(function(err, result) {
+       await new_seven_up_down_wallet_transactions.save(function(err, result) {
             if(result){
                 // console.log(result);
                 cb(false,true);
@@ -279,7 +279,7 @@ function inserWalletTransaction(entry_time,user,user_id, pin, amount, type, tr_t
     }else if(table_name == "zero_to_nine"){
         // console.log(table_name);
         var new_seven_up_down_wallet_transactions = new allModel.SevenUpDownWalletTransactionModel(insert_transaction_array);
-        new_seven_up_down_wallet_transactions.save(function(err, result) {
+       await new_seven_up_down_wallet_transactions.save(function(err, result) {
             if(result){
                 // console.log(result);
                 cb(false,true);
@@ -292,7 +292,7 @@ function inserWalletTransaction(entry_time,user,user_id, pin, amount, type, tr_t
         delete insert_transaction_array.wallet;
 
         var new_damdar_shatak_wallet_transaction = new allModel.DamdarShatakWalletTransactionModel(insert_transaction_array);
-        new_seven_up_down_wallet_transactions.save(function(err, result) {
+      await  new_seven_up_down_wallet_transactions.save(function(err, result) {
             if(result){
                 // console.log(result);
                 cb(false,true);
@@ -303,7 +303,7 @@ function inserWalletTransaction(entry_time,user,user_id, pin, amount, type, tr_t
     }else if(table_name == "admin_fund"){
         // console.log(table_name);
         var new_admin_fund_wallet_transaction = new allModel.AdminFundWalletTransactionModel(insert_transaction_array);
-        new_admin_fund_wallet_transaction.save(function(err, result) {
+       await new_admin_fund_wallet_transaction.save(function(err, result) {
             if(result){
                 // console.log(result);
                 cb(false,true);
@@ -317,7 +317,7 @@ function inserWalletTransaction(entry_time,user,user_id, pin, amount, type, tr_t
     }else if(table_name == "buy_sell"){
         // console.log(table_name);
         var new_buySellWalletTransaction = new allModel.BuySellWalletTransaction(insert_transaction_array);
-        new_buySellWalletTransaction.save(function(err, result) {
+       await new_buySellWalletTransaction.save(function(err, result) {
             if(result){
                 // console.log(result);
                 cb(false,true);
@@ -328,12 +328,12 @@ function inserWalletTransaction(entry_time,user,user_id, pin, amount, type, tr_t
     }  
 }
 
-function updateAdminBalanceEntry(user_id,type,amount,pin,cb){
-    allModel.DashboardModel.find({'id' : user_id}).then(function(result) {
+async function updateAdminBalanceEntry(user_id,type,amount,pin,cb){
+    await  allModel.DashboardModel.find({'id' : user_id}).then(function(result) {
         // console.log(result);
         let user = result;
         // console.log(user);
-        allModel.DashboardModel.find({'id' : '1'}).then(function(result) {
+         allModel.DashboardModel.find({'id' : '1'}).then(function(result) {
             // console.log(result,'dddddddddddddd');
             let dashboard = result;
             let prev_balance = parseInt(dashboard.sevenudadmin_wallet) - parseInt(dashboard.sevenudadmin_wallet_withdraw);
