@@ -1,0 +1,1 @@
+{"options":{},"indexes":[{"v":{"$numberInt":"2"},"key":{"_id":{"$numberInt":"1"}},"name":"_id_","ns":"saddaddapanel.dashboards"}],"uuid":"b40f40bb59194911a9a684c8efa1ca12"}
