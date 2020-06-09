@@ -12,14 +12,14 @@ let profit;
 let adminDashboard;
 let prj_settings;
 let status;
-allModel.DashboardModel.find({'id' : "1"}).then(function(result) {
-    adminDashboard = result[0];
-    // console.log(adminDashboard);
-    // console.log('got admin');
-}).catch(function(error){
-    // console.log(error);
-    res.json({status : false , error : error});
-});
+// allModel.DashboardModel.find({'id' : "1"}).then(function(result) {
+//     adminDashboard = result[0];
+//     // console.log(adminDashboard);
+//     // console.log('got admin');
+// }).catch(function(error){
+//     // console.log(error);
+//     res.json({status : false , error : error});
+// });
 
 allModel.ProjectSettingModel.find({"project_name" : "Sadda Adda"}).then(function(result) {
     prj_settings = result[0];
